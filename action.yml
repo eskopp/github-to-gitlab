@@ -1,0 +1,24 @@
+name: 'GitHub to GitLab Sync'
+description: 'Sync all branches from GitHub to GitLab using a Docker container with Git installed.'
+
+inputs:
+  git_username:
+    description: 'Git username to set up Git'
+    required: true
+  git_email:
+    description: 'Git email to set up Git'
+    required: true
+  gitlab_repo:
+    description: 'The GitLab repository URL'
+    required: true
+  gitlab_token:
+    description: 'GitLab token for authentication'
+    required: true
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+
+branding:
+  icon: 'git-merge'
+  color: 'blue'
