@@ -41,7 +41,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Sync GitHub to GitLab
-        uses: ./path-to-action
+        uses: eskopp/github-to-gitlab@v1
         with:
           git_username: ${{ secrets.GIT_USERNAME }}
           git_email: ${{ secrets.GIT_EMAIL }}
