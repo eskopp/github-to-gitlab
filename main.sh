@@ -1,43 +1,53 @@
 #!/bin/bash
 set -e
+ls -aril
+
+# Assign GitHub Action inputs to local variables
+git_username="$INPUT_GIT_USERNAME"
+git_email="$INPUT_GIT_EMAIL"
+gitlab_repo="$INPUT_GITLAB_REPO"
+gitlab_token="$INPUT_GITLAB_TOKEN"
 
 # Check if required environment variables are set, using GitHub Actions error annotation
-if [ -z "$INPUT_GIT_USERNAME" ]; then
+if [ -z "$git_username" ]; then
   echo "::error::git_username is not set."
   exit 1
 fi
 
-if [ -z "$INPUT_GIT_EMAIL" ]; then
+if [ -z "$git_email" ]; then
   echo "::error::git_email is not set."
   exit 1
 fi
 
-if [ -z "$INPUT_GITLAB_REPO" ]; then
+if [ -z "$gitlab_repo" ]; then
   echo "::error::gitlab_repo is not set."
   exit 1
 fi
 
-if [ -z "$INPUT_GITLAB_TOKEN" ]; then
+if [ -z "$gitlab_token" ]; then
   echo "::error::gitlab_token is not set."
   exit 1
 fi
+
+# Mark the GitHub Actions workspace as a safe directory
+git config --global --add safe.directory /github/workspace
 
 # Extract the branch name from the GitHub reference
 branch_name=$(echo "${GITHUB_REF#refs/heads/}")
 
 # Configure Git with error handling
-if ! git config --global user.name "$INPUT_GIT_USERNAME"; then
+if ! git config --global user.name "$git_username"; then
   echo "::error::Failed to configure Git username."
   exit 1
 fi
 
-if ! git config --global user.email "$INPUT_GIT_EMAIL"; then
+if ! git config --global user.email "$git_email"; then
   echo "::error::Failed to configure Git email."
   exit 1
 fi
 
 # Add GitLab remote using the GitLab token for authentication, with error handling
-if ! git remote add gitlab https://gitlab-ci-token:${gitlab_token}@${INPUT_GITLAB_REPO}; then
+if ! git remote add gitlab https://gitlab-ci-token:${gitlab_token}@${gitlab_repo}; then
   echo "::error::Failed to add GitLab remote."
   exit 1
 fi

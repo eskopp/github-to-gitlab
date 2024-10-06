@@ -2,7 +2,7 @@
 FROM archlinux:latest
 
 # Install Git and bash in the Arch environment
-RUN pacman -Sy --noconfirm git bash
+RUN pacman -Sy --noconfirm git bash pwd 
 
 # Set the working directory
 WORKDIR /action
