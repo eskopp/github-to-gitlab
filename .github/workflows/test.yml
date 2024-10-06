@@ -1,0 +1,24 @@
+name: Sync all branches to GitLab - new 
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code from GitHub
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Run GitHub to GitLab Sync Action
+      uses: eskopp/github-to-gitlab-sync@main 
+      with:
+        git_username: "eskopp"
+        git_email: "skopp.erik@gmail.com" 
+        gitlab_repo: "https://gitlab.erik-skopp.de/eskopp/test.git" 
+        gitlab_token: ${{ secrets.GITLAB }} 
