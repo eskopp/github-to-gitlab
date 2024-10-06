@@ -6,20 +6,19 @@ import (
 	"os"
 
 	git "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 )
 
 func main() {
 	// Get environment variables for Git configuration
-	gitUsername := os.Getenv("GIT_USERNAME")
-	gitEmail := os.Getenv("GIT_EMAIL")
 	gitlabToken := os.Getenv("GITLAB_TOKEN")
 	githubURL := "https://github.com/yourusername/yourrepo.git"                                     // Replace with your GitHub repo URL
 	gitlabURL := "https://gitlab-ci-token:" + gitlabToken + "@gitlab.com/yourusername/yourrepo.git" // Replace with your GitLab repo URL
 
 	// Validate environment variables
-	if gitUsername == "" || gitEmail == "" || gitlabToken == "" {
-		log.Fatal("Environment variables GIT_USERNAME, GIT_EMAIL, or GITLAB_TOKEN are not set")
+	if gitlabToken == "" {
+		log.Fatal("Environment variable GITLAB_TOKEN is not set")
 	}
 
 	// Clone the GitHub repository to a temporary directory
@@ -32,22 +31,9 @@ func main() {
 		log.Fatalf("Failed to clone GitHub repository: %s", err)
 	}
 
-	// Configure Git user
-	fmt.Println("Configuring Git username and email...")
-	config, err := repo.Config()
-	if err != nil {
-		log.Fatalf("Failed to retrieve Git config: %s", err)
-	}
-	config.User.Name = gitUsername
-	config.User.Email = gitEmail
-	err = repo.Storer.SetConfig(config)
-	if err != nil {
-		log.Fatalf("Failed to set Git config: %s", err)
-	}
-
 	// Add the GitLab remote
 	fmt.Println("Adding GitLab remote...")
-	_, err = repo.CreateRemote(&git.Config{
+	_, err = repo.CreateRemote(&config.RemoteConfig{
 		Name: "gitlab",
 		URLs: []string{gitlabURL},
 	})
@@ -80,11 +66,11 @@ func main() {
 		log.Fatalf("Failed to push branches to GitLab: %s", err)
 	}
 
-	// Push all tags to GitLab
+	// Push all tags to GitLab using RefSpec as a string
 	fmt.Println("Pushing all tags to GitLab...")
 	err = repo.Push(&git.PushOptions{
 		RemoteName: "gitlab",
-		RefSpecs: []git.RefSpec{
+		RefSpecs: []config.RefSpec{
 			"refs/tags/*:refs/tags/*",
 		},
 		Auth:     auth,
