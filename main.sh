@@ -34,11 +34,6 @@ git config --global --add safe.directory /github/workspace
 # Extract the branch name from the GitHub reference
 branch_name=$(echo "${GITHUB_REF#refs/heads/}")
 
-# Check if the GitLab repository URL already contains https://, if not, prepend it
-if [[ "$gitlab_repo" != "https://*" ]]; then
-  gitlab_repo="https://$gitlab_repo"
-fi
-
 # Configure Git with error handling
 if ! git config --global user.name "$git_username"; then
   echo "::error::Failed to configure Git username."
