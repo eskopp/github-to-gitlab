@@ -17,7 +17,7 @@ if [ -z "$INPUT_GITLAB_REPO" ]; then
   exit 1
 fi
 
-if [ -z "$gitlab_token" ]; then
+if [ -z "$INPUT_GITLAB_TOKEN" ]; then
   echo "::error::gitlab_token is not set."
   exit 1
 fi
