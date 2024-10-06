@@ -15,7 +15,7 @@ COPY . .
 RUN go build -o /app/main .
 
 # Use Alpine as the base for running the app
-FROM alpine:3.15
+FROM alpine:3.20
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
