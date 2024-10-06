@@ -26,7 +26,7 @@ func main() {
 	gitUsername := os.Getenv("INPUT_GIT_USERNAME")
 	gitEmail := os.Getenv("INPUT_GIT_EMAIL")
 	gitlabRepo := os.Getenv("INPUT_GITLAB_REPO")
-	gitlabToken := os.Getenv("INPUT_GITLAB_TOKEN") // GitLab token only for authentication
+	gitlabToken := os.Getenv("INPUT_GITLAB_TOKEN")
 	githubToken := os.Getenv("INPUT_GITHUB_TOKEN")
 	base64Flag := os.Getenv("INPUT_BASE64")
 
@@ -109,8 +109,8 @@ func main() {
 	err = repo.Push(&git.PushOptions{
 		RemoteName: "gitlab",
 		Auth: &http.BasicAuth{
-			Username: "gitlab-ci-token", // This is required for GitLab token authentication
-			Password: gitlabToken,       // GitLab token for authentication
+			Username: "gitlab-ci-token",
+			Password: gitlabToken,
 		},
 		Progress: os.Stdout,
 	})
@@ -126,8 +126,8 @@ func main() {
 			"refs/tags/*:refs/tags/*",
 		},
 		Auth: &http.BasicAuth{
-			Username: "gitlab-ci-token", // GitLab token username
-			Password: gitlabToken,       // GitLab token for authentication
+			Username: "gitlab-ci-token",
+			Password: gitlabToken,
 		},
 		Progress: os.Stdout,
 	})
