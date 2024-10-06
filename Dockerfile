@@ -1,5 +1,5 @@
-# Use the official Go image (version 1.23.2) to build the app
-FROM golang:1.23.2-alpine AS builder
+# Use the official Go image to build the app
+FROM golang:1.23.2 AS builder
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
@@ -8,26 +8,23 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy the source code from the current directory to the Working Directory inside the container
+# Copy the source from the current directory to the Working Directory inside the container
 COPY . .
 
 # Build the Go app
-RUN go build -o main .
+RUN go build -o /app/main .
 
-# Use a minimal Alpine image for running the application
-FROM alpine:3.20
+# Use Artix Linux as the base for running the app
+FROM artixlinux/base:latest
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
+# Install Git on Artix
+RUN pacman -Sy --noconfirm git
+
 # Copy the pre-built binary from the builder stage
 COPY --from=builder /app/main .
 
-# Install Git to enable Git commands in the container
-RUN apk add --no-cache git
-
-# Expose any ports (if needed)
-# EXPOSE 8080
-
-# Command to run the executable
-ENTRYPOINT ["./main"]
+# Run the Go binary
+CMD ["/main"]
