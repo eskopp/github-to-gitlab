@@ -34,7 +34,7 @@ jobs:
         fetch-depth: 0
 
     - name: Run GitHub to GitLab Sync Action
-      uses: ./  # Use the local action
+      uses: eskopp/github-to-gitlab-sync@v0.0.3
       with:
         git_username: "Your Git Username"
         git_email: "your-email@example.com"
