@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
@@ -11,54 +12,65 @@ import (
 )
 
 func main() {
-	// Holen Sie sich die Umgebungsvariablen mit dem INPUT_ Präfix
-	githubURL := os.Getenv("INPUT_GITHUB_REPO_URL")
-	gitlabURL := os.Getenv("INPUT_GITLAB_REPO_URL")
+	// Get environment variables for Git configuration and authentication
+	gitUsername := os.Getenv("INPUT_GIT_USERNAME")
+	gitEmail := os.Getenv("INPUT_GIT_EMAIL")
+	gitlabRepo := os.Getenv("INPUT_GITLAB_REPO")
 	gitlabToken := os.Getenv("INPUT_GITLAB_TOKEN")
 
-	// Überprüfen Sie, ob die erforderlichen Umgebungsvariablen gesetzt sind
-	if githubURL == "" || gitlabURL == "" || gitlabToken == "" {
-		log.Fatal("Umgebungsvariablen INPUT_GITHUB_REPO_URL, INPUT_GITLAB_REPO_URL oder INPUT_GITLAB_TOKEN sind nicht gesetzt")
+	// Validate environment variables
+	if gitUsername == "" || gitEmail == "" || gitlabRepo == "" || gitlabToken == "" {
+		log.Fatal("Environment variables INPUT_GIT_USERNAME, INPUT_GIT_EMAIL, INPUT_GITLAB_REPO, or INPUT_GITLAB_TOKEN are not set")
 	}
 
-	// Klonen Sie das GitHub-Repository in ein temporäres Verzeichnis
+	// Configure Git username and email
+	fmt.Println("Configuring Git username and email...")
+	err := exec.Command("git", "config", "--global", "user.name", gitUsername).Run()
+	if err != nil {
+		log.Fatalf("Failed to set Git username: %s", err)
+	}
+	err = exec.Command("git", "config", "--global", "user.email", gitEmail).Run()
+	if err != nil {
+		log.Fatalf("Failed to set Git email: %s", err)
+	}
+
+	// Clone the GitHub repository to a temporary directory
 	fmt.Println("Cloning GitHub repository...")
 	repo, err := git.PlainClone("./repo", false, &git.CloneOptions{
-		URL:      githubURL,
+		URL:      "https://github.com/yourusername/yourrepo.git", // Replace with actual GitHub URL
 		Progress: os.Stdout,
 	})
 	if err != nil {
 		log.Fatalf("Failed to clone GitHub repository: %s", err)
 	}
 
-	// Fügen Sie das GitLab-Remote hinzu
+	// Add the GitLab remote
 	fmt.Println("Adding GitLab remote...")
 	_, err = repo.CreateRemote(&config.RemoteConfig{
 		Name: "gitlab",
-		URLs: []string{gitlabURL},
+		URLs: []string{gitlabRepo},
 	})
 	if err != nil {
 		log.Fatalf("Failed to add GitLab remote: %s", err)
 	}
 
-	// Holen Sie alle Branches und Tags von GitHub
+	// Fetch all branches and tags from GitHub
 	fmt.Println("Fetching all branches and tags from GitHub...")
 	err = repo.Fetch(&git.FetchOptions{
 		RemoteName: "origin",
 		Progress:   os.Stdout,
-		// Hier könnten Sie weitere Optionen hinzufügen, falls benötigt
 	})
 	if err != nil && err != git.NoErrAlreadyUpToDate {
 		log.Fatalf("Failed to fetch branches: %s", err)
 	}
 
-	// Authentifizierung für GitLab
+	// Authenticate using the GitLab token
 	auth := &http.BasicAuth{
-		Username: "gitlab-ci-token", // Dieser Benutzername ist für GitLab-Tokens erforderlich
+		Username: "gitlab-ci-token", // This username is required for GitLab CI tokens
 		Password: gitlabToken,
 	}
 
-	// Pushen Sie alle Branches zu GitLab
+	// Push all branches to GitLab
 	fmt.Println("Pushing all branches to GitLab...")
 	err = repo.Push(&git.PushOptions{
 		RemoteName: "gitlab",
@@ -69,12 +81,12 @@ func main() {
 		log.Fatalf("Failed to push branches to GitLab: %s", err)
 	}
 
-	// Pushen Sie alle Tags zu GitLab
+	// Push all tags to GitLab
 	fmt.Println("Pushing all tags to GitLab...")
 	err = repo.Push(&git.PushOptions{
 		RemoteName: "gitlab",
 		RefSpecs: []config.RefSpec{
-			config.RefSpec("refs/tags/*:refs/tags/*"),
+			"refs/tags/*:refs/tags/*",
 		},
 		Auth:     auth,
 		Progress: os.Stdout,
