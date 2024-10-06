@@ -15,7 +15,7 @@ COPY . .
 RUN go build -o main .
 
 # Use a minimal Alpine image for running the application
-FROM alpine:3.15
+FROM alpine:3.20
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
