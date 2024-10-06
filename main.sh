@@ -35,7 +35,7 @@ git config --global --add safe.directory /github/workspace
 branch_name=$(echo "${GITHUB_REF#refs/heads/}")
 
 # Check if the GitLab repository URL already contains https://, if not, prepend it
-if [[ "$gitlab_repo" != https://* ]]; then
+if [[ "$gitlab_repo" != "https://*" ]]; then
   gitlab_repo="https://$gitlab_repo"
 fi
 
