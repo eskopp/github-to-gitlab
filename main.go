@@ -35,9 +35,9 @@ func main() {
 		log.Fatal("Environment variables INPUT_GIT_USERNAME, INPUT_GIT_EMAIL, INPUT_GITLAB_REPO, INPUT_GITLAB_TOKEN, or INPUT_GITHUB_TOKEN are not set")
 	}
 
-	// Decode the username, email, GitHub token, and repo URL from Base64 if the base64Flag is set to true
+	// Decode the username, email, and repo URL from Base64 if the base64Flag is set to true
 	if base64Flag == "true" {
-		fmt.Println("Base64 flag is true, decoding username, email, GitHub token, and repository URL...")
+		fmt.Println("Base64 flag is true, decoding username, email, and repository URL...")
 		var err error
 		gitUsername, err = decodeBase64(gitUsername)
 		if err != nil {
@@ -50,10 +50,6 @@ func main() {
 		gitlabRepo, err = decodeBase64(gitlabRepo)
 		if err != nil {
 			log.Fatalf("Failed to decode GitLab repository URL from Base64: %s", err)
-		}
-		githubToken, err = decodeBase64(githubToken)
-		if err != nil {
-			log.Fatalf("Failed to decode GitHub token from Base64: %s", err)
 		}
 	}
 
@@ -68,7 +64,7 @@ func main() {
 		log.Fatalf("Failed to set Git email: %s", err)
 	}
 
-	// Authenticate using the GitHub token
+	// Authenticate using the GitHub token (without encoding/decoding)
 	auth := &http.BasicAuth{
 		Username: gitUsername,
 		Password: githubToken, // Use the GitHub token for authentication
