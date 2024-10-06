@@ -20,7 +20,6 @@ This action is designed to automatically sync a GitHub repository to a GitLab re
 | `github_token` | GitHub token for authentication when cloning.      | Yes      | N/A     |
 | `base64`       | Whether to decode username, email, and GitLab repo | No       | `false` |
 
-| `gitlab_token` | GitLab token for authentication.     | true     |
 ## Usage
 
 To use this action, add the following to your GitHub Actions workflow file:
