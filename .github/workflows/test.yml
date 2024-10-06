@@ -1,4 +1,4 @@
-name: Sync all branches to GitLab - new
+name: Sync all branches to GitLab
 
 on:
     push:
