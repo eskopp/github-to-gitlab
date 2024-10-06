@@ -74,6 +74,7 @@ git remote -v
 if ! git fetch gitlab; then
   echo "::error::Failed to fetch from GitLab. - new"
   echo "::debug::Retrying fetch command with verbose output"
+  echo gitlab
   git fetch gitlab --verbose
   exit 1
 fi
