@@ -2,7 +2,7 @@
 FROM archlinux:latest
 
 # Install Git and bash in the Arch environment
-RUN pacman -Sy --noconfirm git bash pwd 
+RUN pacman -Sy --noconfirm git bash
 
 # Set the working directory
 WORKDIR /action
@@ -15,3 +15,4 @@ RUN chmod +x main.sh
 
 # Run the Bash script
 CMD ["bash", "/action/main.sh"]
+
