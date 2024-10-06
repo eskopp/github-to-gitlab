@@ -7,6 +7,11 @@ git_email="$INPUT_GIT_EMAIL"
 gitlab_repo="$INPUT_GITLAB_REPO"
 gitlab_token="$INPUT_GITLAB_TOKEN"
 
+# Debugging: Show values of inputs
+echo "::debug::git_username: $git_username"
+echo "::debug::git_email: $git_email"
+echo "::debug::gitlab_repo (before check): $gitlab_repo"
+
 # Check if required environment variables are set, using GitHub Actions error annotation
 if [ -z "$git_username" ]; then
   echo "::error::git_username is not set."
@@ -34,12 +39,15 @@ git config --global --add safe.directory /github/workspace
 # Extract the branch name from the GitHub reference
 branch_name=$(echo "${GITHUB_REF#refs/heads/}")
 
-# Ensure the GitLab repository URL does not have duplicate https://
+# Debugging: Check if GitLab repository URL has https:// already
 if [[ "$gitlab_repo" =~ ^https:// ]]; then
   full_gitlab_repo="$gitlab_repo"
 else
   full_gitlab_repo="https://$gitlab_repo"
 fi
+
+# Debugging: Show the final value of the full GitLab repo URL
+echo "::debug::full_gitlab_repo (after check): $full_gitlab_repo"
 
 # Configure Git with error handling
 if ! git config --global user.name "$git_username"; then
@@ -64,7 +72,7 @@ git remote -v
 
 # Fetch from GitLab with error handling
 if ! git fetch gitlab; then
-  echo "::error::Failed to fetch from GitLab."
+  echo "::error::Failed to fetch from GitLab. - new"
   echo "::debug::Retrying fetch command with verbose output"
   git fetch gitlab --verbose
   exit 1
