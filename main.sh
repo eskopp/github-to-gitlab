@@ -34,9 +34,11 @@ git config --global --add safe.directory /github/workspace
 # Extract the branch name from the GitHub reference
 branch_name=$(echo "${GITHUB_REF#refs/heads/}")
 
-# Check if the GitLab repository URL already contains https://, if not, prepend it
-if [[ "$gitlab_repo" != https://* ]]; then
-  gitlab_repo="https://$gitlab_repo"
+# Ensure the GitLab repository URL does not have duplicate https://
+if [[ "$gitlab_repo" == https://* ]]; then
+  full_gitlab_repo="$gitlab_repo"
+else
+  full_gitlab_repo="https://$gitlab_repo"
 fi
 
 # Configure Git with error handling
@@ -51,7 +53,7 @@ if ! git config --global user.email "$git_email"; then
 fi
 
 # Add GitLab remote using the GitLab token for authentication, with error handling
-if ! git remote add gitlab "https://gitlab-ci-token:${gitlab_token}@${gitlab_repo}"; then
+if ! git remote add gitlab "https://gitlab-ci-token:${gitlab_token}@${full_gitlab_repo}"; then
   echo "::error::Failed to add GitLab remote."
   exit 1
 fi
