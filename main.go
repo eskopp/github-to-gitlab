@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log"
 	"os"
@@ -11,16 +12,49 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 )
 
+// Helper function to decode Base64 strings
+func decodeBase64(encodedStr string) (string, error) {
+	decodedBytes, err := base64.StdEncoding.DecodeString(encodedStr)
+	if err != nil {
+		return "", err
+	}
+	return string(decodedBytes), nil
+}
+
 func main() {
 	// Get environment variables for Git configuration and authentication
 	gitUsername := os.Getenv("INPUT_GIT_USERNAME")
 	gitEmail := os.Getenv("INPUT_GIT_EMAIL")
 	gitlabRepo := os.Getenv("INPUT_GITLAB_REPO")
 	gitlabToken := os.Getenv("INPUT_GITLAB_TOKEN")
+	githubToken := os.Getenv("INPUT_GITHUB_TOKEN")
+	base64Flag := os.Getenv("INPUT_BASE64")
 
 	// Validate environment variables
-	if gitUsername == "" || gitEmail == "" || gitlabRepo == "" || gitlabToken == "" {
-		log.Fatal("Environment variables INPUT_GIT_USERNAME, INPUT_GIT_EMAIL, INPUT_GITLAB_REPO, or INPUT_GITLAB_TOKEN are not set")
+	if gitUsername == "" || gitEmail == "" || gitlabRepo == "" || gitlabToken == "" || githubToken == "" {
+		log.Fatal("Environment variables INPUT_GIT_USERNAME, INPUT_GIT_EMAIL, INPUT_GITLAB_REPO, INPUT_GITLAB_TOKEN, or INPUT_GITHUB_TOKEN are not set")
+	}
+
+	// Decode the username, email, GitHub token, and repo URL from Base64 if the base64Flag is set to true
+	if base64Flag == "true" {
+		fmt.Println("Base64 flag is true, decoding username, email, GitHub token, and repository URL...")
+		var err error
+		gitUsername, err = decodeBase64(gitUsername)
+		if err != nil {
+			log.Fatalf("Failed to decode Git username from Base64: %s", err)
+		}
+		gitEmail, err = decodeBase64(gitEmail)
+		if err != nil {
+			log.Fatalf("Failed to decode Git email from Base64: %s", err)
+		}
+		gitlabRepo, err = decodeBase64(gitlabRepo)
+		if err != nil {
+			log.Fatalf("Failed to decode GitLab repository URL from Base64: %s", err)
+		}
+		githubToken, err = decodeBase64(githubToken)
+		if err != nil {
+			log.Fatalf("Failed to decode GitHub token from Base64: %s", err)
+		}
 	}
 
 	// Configure Git username and email
@@ -34,10 +68,17 @@ func main() {
 		log.Fatalf("Failed to set Git email: %s", err)
 	}
 
+	// Authenticate using the GitHub token
+	auth := &http.BasicAuth{
+		Username: gitUsername,
+		Password: githubToken, // Use the GitHub token for authentication
+	}
+
 	// Clone the GitHub repository to a temporary directory
 	fmt.Println("Cloning GitHub repository...")
 	repo, err := git.PlainClone("./repo", false, &git.CloneOptions{
 		URL:      "https://github.com/yourusername/yourrepo.git", // Replace with actual GitHub URL
+		Auth:     auth,                                           // Pass the auth struct for authentication
 		Progress: os.Stdout,
 	})
 	if err != nil {
@@ -64,18 +105,15 @@ func main() {
 		log.Fatalf("Failed to fetch branches: %s", err)
 	}
 
-	// Authenticate using the GitLab token
-	auth := &http.BasicAuth{
-		Username: "gitlab-ci-token", // This username is required for GitLab CI tokens
-		Password: gitlabToken,
-	}
-
 	// Push all branches to GitLab
 	fmt.Println("Pushing all branches to GitLab...")
 	err = repo.Push(&git.PushOptions{
 		RemoteName: "gitlab",
-		Auth:       auth,
-		Progress:   os.Stdout,
+		Auth: &http.BasicAuth{
+			Username: "gitlab-ci-token", // GitLab token username
+			Password: gitlabToken,       // GitLab token for authentication
+		},
+		Progress: os.Stdout,
 	})
 	if err != nil && err != git.NoErrAlreadyUpToDate {
 		log.Fatalf("Failed to push branches to GitLab: %s", err)
@@ -88,7 +126,10 @@ func main() {
 		RefSpecs: []config.RefSpec{
 			"refs/tags/*:refs/tags/*",
 		},
-		Auth:     auth,
+		Auth: &http.BasicAuth{
+			Username: "gitlab-ci-token",
+			Password: gitlabToken,
+		},
 		Progress: os.Stdout,
 	})
 	if err != nil && err != git.NoErrAlreadyUpToDate {

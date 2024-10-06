@@ -1,24 +1,27 @@
-name: 'GitHub to GitLab Sync'
-description: 'Sync all branches from GitHub to GitLab using a Docker container with Git installed.'
+name: "GitHub to GitLab Sync Action"
+description: "Syncs a GitHub repository to a GitLab repository"
 
 inputs:
   git_username:
-    description: 'Git username to set up Git'
+    description: "Git username to set up Git"
     required: true
   git_email:
-    description: 'Git email to set up Git'
+    description: "Git email to set up Git"
     required: true
   gitlab_repo:
-    description: 'The GitLab repository URL'
+    description: "The GitLab repository URL"
     required: true
   gitlab_token:
-    description: 'GitLab token for authentication'
+    description: "GitLab token for authentication"
     required: true
+  github_token:
+    description: "GitHub token for authentication when cloning the repository"
+    required: true
+  base64:
+    description: "If true, decode username, email, GitHub token, and GitLab repo from Base64"
+    required: false
+    default: "false"
 
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-
-branding:
-  icon: 'git-merge'
-  color: 'blue'
+  using: "docker"
+  image: "Dockerfile"
