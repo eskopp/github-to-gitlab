@@ -27,4 +27,4 @@ RUN pacman -Sy --noconfirm git
 COPY --from=builder /app/main .
 
 # Run the Go binary
-CMD ["/main"]
+CMD ["/app/main"]
