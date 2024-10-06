@@ -1,5 +1,5 @@
 # Use the official Go image to build the app
-FROM golang:1.23.2 AS builder
+FROM golang:1.23.2-alpine AS builder
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
@@ -14,14 +14,14 @@ COPY . .
 # Build the Go app
 RUN go build -o /app/main .
 
-# Use Artix Linux as the base for running the app
-FROM artixlinux/base:latest
+# Use Alpine as the base for running the app
+FROM alpine:3.15
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
-# Install Git on Artix
-RUN pacman -Sy --noconfirm git
+# Install Git on Alpine
+RUN apk add --no-cache git
 
 # Copy the pre-built binary from the builder stage
 COPY --from=builder /app/main .
