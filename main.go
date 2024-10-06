@@ -26,7 +26,7 @@ func main() {
 	gitUsername := os.Getenv("INPUT_GIT_USERNAME")
 	gitEmail := os.Getenv("INPUT_GIT_EMAIL")
 	gitlabRepo := os.Getenv("INPUT_GITLAB_REPO")
-	gitlabToken := os.Getenv("INPUT_GITLAB_TOKEN")
+	gitlabToken := os.Getenv("INPUT_GITLAB_TOKEN") // GitLab token only for authentication
 	githubToken := os.Getenv("INPUT_GITHUB_TOKEN")
 	base64Flag := os.Getenv("INPUT_BASE64")
 
@@ -64,6 +64,9 @@ func main() {
 		log.Fatalf("Failed to set Git email: %s", err)
 	}
 
+	// Dynamically generate the GitHub repository URL using GITHUB_REPOSITORY environment variable
+	repoURL := fmt.Sprintf("https://github.com/%s.git", os.Getenv("GITHUB_REPOSITORY"))
+
 	// Authenticate using the GitHub token (without encoding/decoding)
 	auth := &http.BasicAuth{
 		Username: gitUsername,
@@ -73,8 +76,8 @@ func main() {
 	// Clone the GitHub repository to a temporary directory
 	fmt.Println("Cloning GitHub repository...")
 	repo, err := git.PlainClone("./repo", false, &git.CloneOptions{
-		URL:      "https://github.com/yourusername/yourrepo.git", // Replace with actual GitHub URL
-		Auth:     auth,                                           // Pass the auth struct for authentication
+		URL:      repoURL, // Dynamically generated GitHub URL
+		Auth:     auth,    // Pass the auth struct for authentication
 		Progress: os.Stdout,
 	})
 	if err != nil {
@@ -106,7 +109,7 @@ func main() {
 	err = repo.Push(&git.PushOptions{
 		RemoteName: "gitlab",
 		Auth: &http.BasicAuth{
-			Username: "gitlab-ci-token", // GitLab token username
+			Username: "gitlab-ci-token", // This is required for GitLab token authentication
 			Password: gitlabToken,       // GitLab token for authentication
 		},
 		Progress: os.Stdout,
@@ -123,8 +126,8 @@ func main() {
 			"refs/tags/*:refs/tags/*",
 		},
 		Auth: &http.BasicAuth{
-			Username: "gitlab-ci-token",
-			Password: gitlabToken,
+			Username: "gitlab-ci-token", // GitLab token username
+			Password: gitlabToken,       // GitLab token for authentication
 		},
 		Progress: os.Stdout,
 	})
