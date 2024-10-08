@@ -1,3 +1,5 @@
+[![Sync all branches to GitLab](https://github.com/eskopp/github-to-gitlab/actions/workflows/test.yml/badge.svg)](https://github.com/eskopp/github-to-gitlab/actions/workflows/test.yml)
+
 # GitHub to GitLab Sync Action
 
 This action is designed to automatically sync a GitHub repository to a GitLab repository. It ensures that any changes made to the GitHub repository are mirrored on GitLab, keeping both repositories in sync.
