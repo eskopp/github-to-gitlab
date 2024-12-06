@@ -1,4 +1,4 @@
-[![Sync all branches to GitLab](https://github.com/eskopp/github-to-gitlab/actions/workflows/test.yml/badge.svg)](https://github.com/eskopp/github-to-gitlab/actions/workflows/test.yml)
+[![Sync all branches to GitLab](https://github.com/eskopp/github-to-gitlab/actions/workflows/gitlab.yml/badge.svg)](https://github.com/eskopp/github-to-gitlab/actions/workflows/gitlab.yml)
 
 # GitHub to GitLab Sync Action
 
