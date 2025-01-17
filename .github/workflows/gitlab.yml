@@ -20,7 +20,7 @@ jobs:
         with:
           git_username: "ZXNrb3Bw"
           git_email: "c2tvcHAuZXJpa0BnbWFpbC5jb20="
-          gitlab_repo: "aHR0cHM6Ly9naXRsYWIuZXJpay1za29wcC5kZS9naXRodWIvZ2l0aHViLXRvLWdpdGxhYi1lbnRyeXBvaW50LmdpdA=="
+          gitlab_repo: "aHR0cHM6Ly9naXRsYWIuZXJpay1za29wcC5kZS9naXRodWIvZ2l0bGFiLXRvLWdpdGxhYi5naXQ="
           gitlab_token: ${{ secrets.GITLAB }}
           base64: "true"
           github_token: ${{ secrets.GITHUB }}
