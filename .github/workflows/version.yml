@@ -23,7 +23,7 @@ jobs:
           echo "::set-output name=go_version::$LATEST_GO_VERSION"
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: "${{ steps.go-version.outputs.go_version }}"
 
