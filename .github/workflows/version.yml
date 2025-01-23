@@ -27,19 +27,9 @@ jobs:
         with:
           go-version: "${{ steps.go-version.outputs.go_version }}"
 
-      - name: Install Hugo Extended
-        uses: peaceiris/actions-hugo@v3
-        with:
-          hugo-version: "latest"
-          extended: true
-
       - name: Update Go Version in go.mod
         run: |
           go mod edit -go="${{ steps.go-version.outputs.go_version }}"
-
-      - name: Fetch Hugo Modules
-        run: |
-          hugo mod get
 
       - name: Commit and Push Changes
         env:
