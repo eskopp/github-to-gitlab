@@ -1,7 +1,7 @@
 name: Weekly Hugo Update
 
 on:
-  push:
+  push: # Trigger on every push
     branches:
       - main
   schedule:
@@ -32,9 +32,6 @@ jobs:
         with:
           hugo-version: "latest"
           extended: true
-      
-      - name: Enable Go Modules
-        run: echo "GO111MODULE=on" >> $GITHUB_ENV         
 
       - name: Update Go Version in go.mod
         run: |
@@ -42,14 +39,11 @@ jobs:
 
       - name: Fetch Hugo Modules
         run: |
-          go version
-          go get -u ./..
-          go mod tidy
-          go mod download
+          hugo mod get
 
       - name: Commit and Push Changes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
