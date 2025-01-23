@@ -41,6 +41,7 @@ jobs:
         run: |
           go mod get
           go mod tidy
+          go mod download
 
       - name: Commit and Push Changes
         env:
