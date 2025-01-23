@@ -32,6 +32,9 @@ jobs:
         with:
           hugo-version: "latest"
           extended: true
+      
+      - name: Enable Go Modules
+        run: echo "GO111MODULE=on" >> $GITHUB_ENV         
 
       - name: Update Go Version in go.mod
         run: |
