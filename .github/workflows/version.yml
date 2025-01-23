@@ -43,7 +43,7 @@ jobs:
       - name: Fetch Hugo Modules
         run: |
           go version
-          go mod get -u ./..
+          go get -u ./..
           go mod tidy
           go mod download
 
