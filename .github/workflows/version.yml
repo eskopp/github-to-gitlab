@@ -29,8 +29,10 @@ jobs:
 
       - name: Update Go Version in go.mod
         run: |
+          go get -u ./...
           go mod edit -go="${{ steps.go-version.outputs.go_version }}"
-
+          go mod tidy
+          
       - name: Commit and Push Changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB }}
